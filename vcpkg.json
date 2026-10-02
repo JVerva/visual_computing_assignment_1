@@ -1,7 +1,0 @@
-{
-  "dependencies": [
-    "opencv",
-    "gald",
-    "vcpkg"
-  ]
-}
