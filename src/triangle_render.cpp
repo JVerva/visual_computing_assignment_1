@@ -241,8 +241,8 @@ int main( void )
     glEnableVertexAttribArray(0);
 
 
-    GLuint triangle_program = create_shader_program("src/vertex_shader.vert", "src/fragment_shader.frag");
-    GLuint back_program = create_shader_program("src/back_vertex_shader.vert", "src/back_fragment_shader.frag");
+    GLuint triangle_program = create_shader_program("src/vert/triangle.vert", "src/frag/triangle.frag");
+    GLuint back_program = create_shader_program("src/vert/back.vert", "src/frag/back.frag");
 
 	// Ensure we can capture the escape and camera movement keys being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
