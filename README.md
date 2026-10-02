@@ -1,6 +1,6 @@
 # About The Project
 Assignment 1 for Visual Computing course.\
-This project renders a triangle in front of the camera and a background displaying a live webcam capture, mutiple filters can be applied on top of it.\
+This project renders a triangle (at origin coordinates) in front of a camera (that always looks at origin coordinates) and a background displaying a live webcam capture, mutiple filters can be applied on top of it.\
 The rendering is done with OpenGL and the webcam capture and image filtering with OpenCV.\
 This lays the groundwork for a future Augmented reality application.
 # Dependencies
@@ -12,7 +12,6 @@ This project uses [vcpkg](https://github.com/microsoft/vcpkg) to provide its C++
 
 The vcpkg installation commands differ slightly between operating systems.
 
-#### Linux and macOS
 
 Clone vcpkg and run its bootstrap script:
 
@@ -20,16 +19,6 @@ Clone vcpkg and run its bootstrap script:
 git clone https://github.com/microsoft/vcpkg.git /path/to/your/vcpkg
 cd /path/to/your/vcpkg
 ./bootstrap-vcpkg.sh
-```
-
-##### Windows
-
-Run the following commands in PowerShell:
-
-```powershell
-git clone https://github.com/microsoft/vcpkg.git "/path/to/your/vcpkg"
-Set-Location "/path/to/your/vcpkg"
-.\bootstrap-vcpkg.bat
 ```
 
 The following vcpkg packages are required:
@@ -45,23 +34,31 @@ You also need:
 - A C++17-compatible compiler
 - An OpenGL 3.3-compatible graphics driver
 
-OpenCV reads the bundled video and applies the image-processing filters.
+## Install vcpkg packages
 
-# How To Build
-## Install dependencies
-
-From the project root, install the required packages.
+Install the required packages using vcpkg
 
 ```bash
 vcpkg install opencv glad glm glfw3
 ```
 
 
-## Build
+# Project Setup
 
-Configure and build from the project root:
+## Clone the repository
 
-### Linux and macOS
+Run these commands from the directory where you want to clone the repository.
+
+```bash
+git clone https://github.com/JVerva/visual_computing_assignment_1.git
+cd visual_computing_assignment_1
+```
+
+## Configure and build
+
+Run the following commands from the repository directory:
+
+## Linux and macOS
 
 ```bash
 export VCPKG_PATH="/path/to/your/vcpkg"
@@ -69,7 +66,7 @@ cmake -S . -B build
 cmake --build build
 ```
 
-### Windows
+## Windows
 
 ```powershell
 $env:VCPKG_PATH = "/path/to/your/vcpkg"
@@ -81,7 +78,7 @@ The executable is created at `build/triangle_render`.
 
 ## Run project
 
-Run the executable from the project root so that the relative video and shader paths resolve correctly:
+Run the executable from the project root so that the relative shader paths resolve correctly:
 
 ```bash
 ./build/triangle_render
@@ -91,13 +88,16 @@ Run the executable from the project root so that the relative video and shader p
 
 | Key | Action |
 | --- | --- |
+|Camera|
 | `W` | Move the camera forward |
 | `S` | Move the camera backward |
 | `A` | Move the camera left |
 | `D` | Move the camera right |
+|Filters|
 | `0` | Disable the image filter |
 | `1` | Apply grayscale |
 | `2` | Apply blur |
 | `3` | Apply Sobel |
 | `4` | Apply sharpen |
+|Window|
 | `Esc` | Exit the application |
