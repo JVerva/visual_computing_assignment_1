@@ -8,6 +8,17 @@ This lays the groundwork for a future augmented reality application.
 
 This project uses [vcpkg](https://github.com/microsoft/vcpkg) to provide its C++ dependencies. Install vcpkg and set `VCPKG_PATH` to the vcpkg installation directory before configuring CMake.
 
+### Linux system dependencies
+
+Install the required Linux build tools and development libraries:
+
+```bash
+sudo apt-get update
+sudo apt-get install bison
+sudo apt-get install autoconf autoconf-archive automake libtool
+sudo apt-get install libdbus-1-dev libxi-dev libxtst-dev
+```
+
 ### Install vcpkg
 
 The vcpkg installation commands differ slightly between operating systems.
@@ -36,7 +47,20 @@ You also need:
 
 ## Install vcpkg packages
 
-Install the required packages using vcpkg
+Add the vcpkg installation directory to your `PATH` before running the install command:
+
+### Linux and macOS
+```bash
+export PATH="/path/to/your/vcpkg:$PATH"
+```
+
+### Windows
+
+```powershell
+$env:Path = "C:\path\to\your\vcpkg;$env:Path"
+```
+
+Then install the required packages using vcpkg:
 
 ```bash
 vcpkg install opencv glad glm glfw3
