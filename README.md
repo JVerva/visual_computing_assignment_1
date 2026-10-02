@@ -8,8 +8,9 @@ This lays the groundwork for a future augmented reality application.
 
 This project uses [vcpkg](https://github.com/microsoft/vcpkg) to provide its C++ dependencies. Install vcpkg and set `VCPKG_PATH` to the vcpkg installation directory before configuring CMake.
 
-### Linux system dependencies
+The vcpkg installation commands differ slightly between operating systems.
 
+### Linux and macOS
 Install the required Linux build tools and development libraries:
 
 ```bash
@@ -18,22 +19,14 @@ sudo apt-get install bison
 sudo apt-get install autoconf autoconf-archive automake libtool
 sudo apt-get install libdbus-1-dev libxi-dev libxtst-dev
 ```
-
-### Install vcpkg
-
-The vcpkg installation commands differ slightly between operating systems.
-
-
 Clone vcpkg and run its bootstrap script:
-#### Linux and macOS
-
 ```bash
 git clone https://github.com/microsoft/vcpkg.git /path/to/your/vcpkg
 cd /path/to/your/vcpkg
 ./bootstrap-vcpkg.sh
 ```
-#### Windows
-
+### Windows
+Clone vcpkg and run its bootstrap script:
 ```powershell
 git clone https://github.com/microsoft/vcpkg.git /path/to/your/vcpkg
 cd /path/to/your/vcpkg
@@ -102,7 +95,7 @@ cmake --build build
 
 ```powershell
 $env:VCPKG_PATH = "/path/to/your/vcpkg"
-cmake -S . -B build
+cmake -S . -B build -G "Ninja"
 cmake --build build
 ```
 
@@ -112,8 +105,14 @@ The executable is created at `build/triangle_render`.
 
 Run the executable from the project root so that the relative shader paths resolve correctly:
 
+### On Windows
 ```bash
 ./build/triangle_render
+```
+
+### On Windows
+```powershell
+.\build\triangle_render.exe
 ```
 
 ## Controls
