@@ -179,7 +179,7 @@ int main( void )
     }
 
     //open the default webcam (0)
-    cv::VideoCapture cap("videos/4009842-hd_1920_1080_24fps.mp4");
+    cv::VideoCapture cap(0);
 
     // Check if the video was opened successfully
     if (!cap.isOpened()) {
