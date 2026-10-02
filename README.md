@@ -25,11 +25,19 @@ The vcpkg installation commands differ slightly between operating systems.
 
 
 Clone vcpkg and run its bootstrap script:
+#### Linux and macOS
 
 ```bash
 git clone https://github.com/microsoft/vcpkg.git /path/to/your/vcpkg
 cd /path/to/your/vcpkg
 ./bootstrap-vcpkg.sh
+```
+#### Windows
+
+```powershell
+git clone https://github.com/microsoft/vcpkg.git /path/to/your/vcpkg
+cd /path/to/your/vcpkg
+./bootstrap-vcpkg.bat
 ```
 
 The following vcpkg packages are required:
