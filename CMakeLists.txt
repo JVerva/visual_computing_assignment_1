@@ -1,23 +1,24 @@
 cmake_minimum_required(VERSION 3.16)
-
-set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
-
 project(triangle_render)
-set(CMAKE_CXX_STANDARD 17)
 
-find_package(OpenCV CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
-add_executable(triangle_render
-    src/triangle_render.cpp
-)
+find_package(glfw3 REQUIRED)
+find_package(OpenCV REQUIRED)
 
+include(FetchContent)
+
+FetchContent_Declare(glad GIT_REPOSITORY https://github.com/Dav1dde/glad.git)
+
+FetchContent_MakeAvailable(glad)
+
+# 3. Create your executable
+add_executable(triangle_render src/triangle_render.cpp)
+target_include_directories(triangle_render PRIVATE ${glm_INCLUDE_DIRS})
 target_link_libraries(triangle_render PRIVATE
     ${OpenCV_LIBS}
     glfw
-    glad::glad
-    glm::glm
+    glad
 )
+

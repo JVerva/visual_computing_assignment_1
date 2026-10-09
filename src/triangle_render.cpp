@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <opencv2/opencv.hpp>
+#include <opencv5/opencv2/opencv.hpp>
 
 /* 
  * Include Glad
