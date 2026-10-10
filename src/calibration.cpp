@@ -1,23 +1,27 @@
-#include "window.hpp"
-#include <GLFW/glfw3.h>
+#include <filesystem>
+#include <glm/detail/qualifier.hpp>
+#include <glm/glm.hpp>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/opencv.hpp>
+#include <string>
+#include <vector>
 
-void render(Window window);
+namespace fs = std::filesystem;
+
+void load_calibration_images(const std::string &path,
+                             std::vector<cv::Mat> &images);
 
 int main() {
-  Window window = Window("Calibration", 980, 620);
-  window.init();
-  while (!window.should_close()) {
-    render(window);
-    window.swap_buffers();
-    window.poll_events();
-  }
-  window.close();
+  std::vector<cv::Mat> cal_images;
+  load_calibration_images("assets/images", cal_images);
+
+  return 0;
 }
 
-void render(Window window) {
-
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  return;
+void load_calibration_images(const std::string &path,
+                             std::vector<cv::Mat> &images) {
+  for (const fs::directory_entry &entry : fs::directory_iterator(path)) {
+    images.push_back(cv::imread(entry.path()));
+  }
 }
