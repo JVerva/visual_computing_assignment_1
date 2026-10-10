@@ -22,6 +22,11 @@ private:
       glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
 
+  static void frame_buffer_resize_callbak(GLFWwindow *window, int width,
+                                          int height) {
+    glViewport(0, 0, width, height);
+  }
+
 public:
   Window(const std::string &name_, int width_, int height_)
       : name(name_), width(width_), height(height_) {}
@@ -53,7 +58,7 @@ public:
       fprintf(stderr, "Failed to initialize GLAD\n");
       return false;
     }
-
+    glfwSetFramebufferSizeCallback(window, frame_buffer_resize_callbak);
     glfwSetKeyCallback(window, key_callback);
     glClearColor(gruvbox::bg[0], gruvbox::bg[1], gruvbox::bg[2], 1);
 
