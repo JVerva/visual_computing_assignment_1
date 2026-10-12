@@ -1,4 +1,4 @@
-#OUTDATED
+# OUTDATED
 
 # About The Project
 Assignment 1 for Visual Computing course.\
