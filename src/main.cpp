@@ -1,3 +1,4 @@
+#include "camera.hpp"
 #include "computer_vision.hpp"
 #include "window.hpp"
 #include <GLFW/glfw3.h>

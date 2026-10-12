@@ -23,6 +23,7 @@ target_include_directories(triangle_render PRIVATE ${glm_INCLUDE_DIRS}
 target_include_directories(engine PRIVATE ${glm_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
+  glad
 )
 
 target_link_libraries(triangle_render PRIVATE
@@ -30,9 +31,11 @@ target_link_libraries(triangle_render PRIVATE
     glfw
     glad
 )
+
 target_link_libraries(engine PRIVATE
     ${OpenCV_LIBS}
     glfw
     glad
 )
+
 
