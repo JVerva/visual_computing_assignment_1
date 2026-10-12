@@ -1,3 +1,5 @@
+#OUTDATED
+
 # About The Project
 Assignment 1 for Visual Computing course.\
 This project renders a triangle (at origin coordinates) in front of a camera (that always looks at origin coordinates) and a background displaying a live webcam capture, mutiple filters can be applied on top of it.\
