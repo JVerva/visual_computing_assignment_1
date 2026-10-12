@@ -4,6 +4,8 @@
 #include "utils.hpp"
 #include <cstdio>
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <string>
 
 class Shader {
 public:
@@ -53,7 +55,7 @@ public:
 
     GLuint frag_shader;
     frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag_shader, 1, &c_vert_src, NULL);
+    glShaderSource(frag_shader, 1, &c_frag_src, NULL);
     glCompileShader(frag_shader);
     // print shader compilation errors
     glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &c_success);
@@ -82,9 +84,12 @@ public:
     return true;
   }
 
+  void set_matrix_4f(const std::string &uniform_name, const glm::mat4 &matrix) {
+    int mat_location = glGetUniformLocation(id, uniform_name.c_str());
+    glUniformMatrix4fv(mat_location, 1, GL_FALSE, glm::value_ptr(matrix));
+  }
+
   void use() { glUseProgram(id); }
 };
-
-// uniform setting methods
 
 #endif
