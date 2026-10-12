@@ -1,3 +1,6 @@
+#ifndef COMPUTER_VISION_HPP
+#define COMPUTER_VISION_HPP
+
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
@@ -21,3 +24,5 @@ static bool calibrate_camera_from_chessboard_images(
     const std::vector<cv::Mat> &images, const cv::Size &pattern_size,
     cv::Mat &cam, std::vector<double> &dist_coefs,
     std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs);
+
+#endif

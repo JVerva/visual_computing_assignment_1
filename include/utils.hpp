@@ -1,3 +1,6 @@
+#ifndef UTILS_HPP
+#define UTILS_HPP
+
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -14,3 +17,5 @@ bool read_file(const std::string &path, std::string &file_content) {
 
   return true;
 }
+
+#endif

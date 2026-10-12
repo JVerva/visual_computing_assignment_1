@@ -1,3 +1,6 @@
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
+
 #include "themes.hpp"
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,3 +79,5 @@ public:
     glfwTerminate();
   }
 };
+
+#endif

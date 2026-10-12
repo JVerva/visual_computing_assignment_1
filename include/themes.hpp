@@ -1,4 +1,5 @@
-#ifndef GRUVBOX_HPP #define GRUVBOX_HPP
+#ifndef THEMES_HPP
+#define THEMES_HPP
 
 namespace gruvbox {
 // Format: { Red, Green, Blue }
