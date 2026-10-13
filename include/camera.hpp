@@ -19,10 +19,9 @@ public:
   glm::float64 fov = 45.0f;
 
   Camera() {}
-  Camera(glm::vec3 camera_pos_, glm::vec3 camera_target_, glm::vec3 up_direction_,
-         glm::float64 fov_, glm::float64 aspect_ratio_,
-         glm::float64 close_plane_distance_,
-         glm::float64 far_plane_distance_) {
+  Camera(glm::vec3 camera_pos_, glm::vec3 camera_target_,
+         glm::vec3 up_direction_, glm::float64 fov_, glm::float64 aspect_ratio_,
+         glm::float64 close_plane_distance_, glm::float64 far_plane_distance_) {
     camera_pos = camera_pos_;
     camera_target = camera_target_;
     up = up_direction_;
@@ -42,13 +41,15 @@ public:
   }
 
   glm::vec3 get_camera_up() {
-    return glm::normalize(glm::cross(get_camera_direction(), get_camera_right()));
+    return glm::normalize(
+        glm::cross(get_camera_direction(), get_camera_right()));
   }
 
   glm::vec3 get_camera_front() { return -get_camera_direction(); }
 
   glm::mat4 get_view_matrix() {
-    return glm::lookAt(camera_pos, camera_pos + get_camera_front(), get_camera_up());
+    return glm::lookAt(camera_pos, camera_pos + get_camera_front(),
+                       get_camera_up());
   }
 
   glm::mat4 get_projection_matrix() {

@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "geometry.hpp"
 #include "shader.hpp"
+#include "themes.hpp"
 #include <cstddef>
 #include <cstdio>
 #include <glad/glad.h>
@@ -15,10 +16,25 @@
 #include <string>
 #include <vector>
 
+struct Material {
+  GLuint diffuse_texture;
+  GLuint specular_texture;
+  float shininess;
+};
+
+struct DirectionalLight {
+  glm::vec3 direction;
+
+  glm::vec3 ambient;
+  glm::vec3 diffuse;
+  glm::vec3 specular;
+};
+
 class Mesh {
 public:
-  Mesh(const std::vector<Vertex> &vertices_, const std::vector<uint> &indices_)
-      : vertices(vertices_), indices(indices_) {}
+  Mesh(const std::vector<Vertex> &vertices_, const std::vector<uint> &indices_,
+       const Material &material_)
+      : vertices(vertices_), indices(indices_), material(material_) {}
   void setup() {
     // gen bind and fill vertex array, vertex buffer object and elemenr buffer
     // object
@@ -51,14 +67,27 @@ public:
   }
 
   void draw(Shader &shader) {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, material.diffuse_texture);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, material.specular_texture);
+
+    shader.set_int("material.diffuse", 1);
+    shader.set_int("material.specular", 2);
+    shader.set_float("material.shininess", material.shininess);
+
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(0);
   }
 
 private:
   std::vector<Vertex> vertices;
   std::vector<GLuint> indices;
+
+  Material material;
+
   GLuint vao, vbo, ebo;
 };
 
@@ -101,19 +130,29 @@ public:
 class Renderer {
 private:
   std::vector<Model> models;
+  DirectionalLight light;
   Shader shader = Shader(std::string(PROJECT_DIR) + "/src/vert/vertex.vert",
-                         std::string(PROJECT_DIR) + "/src/frag/triangle.frag");
+                         std::string(PROJECT_DIR) + "/src/frag/fragment.frag");
   Camera camera;
 
 public:
   Renderer(Camera camera_) : camera(camera_) {}
 
-  bool setup() { return shader.build(); }
+  bool setup() {
+
+    glClearColor(red_channel(gruvbox::bg), green_channel(gruvbox::bg),
+                 blue_channel(gruvbox::bg), 1);
+    glEnable(GL_DEPTH_TEST);
+    return shader.build();
+  }
 
   void add_model_to_scene(Model &model) { models.push_back(model); }
 
+  void set_scene_light(DirectionalLight &light_) { light = light_; }
+
   void render_scene() {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     if (!shader.is_built) {
       fprintf(stderr, "No shader programs built, please setup the rederer!\n");
       return;
@@ -122,6 +161,12 @@ public:
 
     shader.set_matrix_4f("view", camera.get_view_matrix());
     shader.set_matrix_4f("projection", camera.get_projection_matrix());
+    shader.set_vec3("view_position", camera.camera_pos);
+
+    shader.set_vec3("light.direction", light.direction);
+    shader.set_vec3("light.ambient", light.ambient);
+    shader.set_vec3("light.diffuse", light.diffuse);
+    shader.set_vec3("light.specular", light.specular);
 
     for (Model model : models) {
       model.draw(shader);

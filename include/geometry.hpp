@@ -11,8 +11,9 @@ struct Vertex {
   glm::vec2 uv;
 };
 
-void get_cube_geometry(float side, std::vector<Vertex> &vertices,
-                       std::vector<glm::uint> &indices) {
+static constexpr void get_cube_geometry(float side,
+                                        std::vector<Vertex> &vertices,
+                                        std::vector<glm::uint> &indices) {
   const float half_side = side * 0.5f;
 
   vertices = {

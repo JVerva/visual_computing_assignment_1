@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include <cstdio>
 #include <glad/glad.h>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 
@@ -50,7 +51,7 @@ public:
     // load and compile fragment shader
     success = read_file(frag_path, frag_src);
     if (!success) {
-      fprintf(stderr, "Failed to open vetex shader file!");
+      fprintf(stderr, "Failed to open fragment shader file!\n");
       return false;
     }
     const char *c_frag_src = frag_src.c_str();
@@ -88,10 +89,24 @@ public:
   }
 
   void set_matrix_4f(const std::string &uniform_name, const glm::mat4 &matrix) {
-    int mat_location = glGetUniformLocation(id, uniform_name.c_str());
-    glUniformMatrix4fv(mat_location, 1, GL_FALSE, glm::value_ptr(matrix));
+    int location = glGetUniformLocation(id, uniform_name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
   }
 
+  void set_int(const std::string &uniform_name, const int &value) {
+    int location = glGetUniformLocation(id, uniform_name.c_str());
+    glUniform1i(location, value);
+  }
+
+  void set_float(const std::string &uniform_name, const float &value) {
+    int location = glGetUniformLocation(id, uniform_name.c_str());
+    glUniform1f(location, value);
+  }
+
+  void set_vec3(const std::string &uniform_name, const glm::vec3 &vector) {
+    int location = glGetUniformLocation(id, uniform_name.c_str());
+    glUniform3f(location, vector.x, vector.y, vector.z);
+  }
   void use() { glUseProgram(id); }
 };
 

@@ -1,7 +1,6 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include "themes.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -63,7 +62,6 @@ public:
     }
     glfwSetFramebufferSizeCallback(window, frame_buffer_resize_callbak);
     glfwSetKeyCallback(window, key_callback);
-    glClearColor(gruvbox::bg[0], gruvbox::bg[1], gruvbox::bg[2], 1);
 
     return true;
   }

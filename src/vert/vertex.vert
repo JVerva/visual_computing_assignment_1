@@ -7,11 +7,13 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
+out vec3 f_position;
 out vec3 f_normal;
 out vec2 f_uv;
 
 void main(){
     gl_Position = projection * view * model * vec4(position, 1.0);
-    f_normal = normal;
+    f_position = vec3(model * vec4(position, 1.0));
+    f_normal = mat3(transpose(inverse(model))) * normal;
     f_uv = uv;
 }
