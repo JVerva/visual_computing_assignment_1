@@ -4,6 +4,7 @@
 #include "window.hpp"
 #include <GLFW/glfw3.h>
 #include <cstdio>
+#include <glm/ext/vector_float3.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
 void render(Window window);
@@ -26,6 +27,8 @@ int main() {
   Mesh cube_mesh = Mesh(cube_vertices, cube_indices);
   Model cube = Model();
   cube.add_mesh(cube_mesh);
+  glm::vec3 translation = glm::vec3(1, 0, 0);
+  cube.move(translation);
   renderer.add_model_to_scene(cube);
 
   while (!window.should_close()) {

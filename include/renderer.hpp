@@ -11,6 +11,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <string>
 #include <vector>
 
@@ -72,6 +73,23 @@ public:
     meshes.push_back(mesh);
   }
 
+  void rotate(const glm::vec3 &angles) {
+    model_transform =
+        glm::rotate(model_transform, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    model_transform =
+        glm::rotate(model_transform, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    model_transform =
+        glm::rotate(model_transform, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
+  }
+
+  void scale(const glm::vec3 &scale_factor) {
+    model_transform = glm::scale(model_transform, scale_factor);
+  }
+
+  void move(const glm::vec3 &translation) {
+    model_transform = glm::translate(model_transform, translation);
+  }
+
   void draw(Shader &shader) {
     shader.set_matrix_4f("model", model_transform);
     for (Mesh mesh : meshes) {
@@ -102,10 +120,8 @@ public:
     }
     shader.use();
 
-    glm::mat4 model = glm::mat4(1);
     shader.set_matrix_4f("view", camera.get_view_matrix());
     shader.set_matrix_4f("projection", camera.get_projection_matrix());
-    shader.set_matrix_4f("model", model);
 
     for (Model model : models) {
       model.draw(shader);
