@@ -8,11 +8,13 @@
 #include <string>
 
 class Shader {
-public:
-  GLuint id;
+private:
   std::string vert_path;
   std::string frag_path;
 
+public:
+  GLuint id;
+  bool is_built = false;
   // reads compiles shaders and builds program
   Shader(const std::string &vertex_shader_path,
          const std::string &fragment_shader_path)
@@ -81,6 +83,7 @@ public:
     glDeleteShader(frag_shader);
 
     id = shader_program;
+    is_built = true;
     return true;
   }
 

@@ -17,6 +17,9 @@ FetchContent_MakeAvailable(glad)
 add_executable(triangle_render src/triangle_render.cpp)
 add_executable(engine src/main.cpp src/computer_vision.cpp)
 
+
+target_compile_definitions(engine PRIVATE PROJECT_DIR="${CMAKE_SOURCE_DIR}")
+
 target_include_directories(triangle_render PRIVATE ${glm_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
@@ -37,5 +40,4 @@ target_link_libraries(engine PRIVATE
     glfw
     glad
 )
-
 

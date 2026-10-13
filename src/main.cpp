@@ -3,6 +3,7 @@
 #include "renderer.hpp"
 #include "window.hpp"
 #include <GLFW/glfw3.h>
+#include <cstdio>
 #include <opencv2/opencv.hpp>
 #include <vector>
 void render(Window window);
@@ -11,17 +12,21 @@ int main() {
   Window window = Window("Calibration", 980, 620);
   window.init();
 
-  Camera camera;
+  Camera camera = Camera();
 
-  Renderer renderer;
-  renderer.setup(camera);
+  Renderer renderer(camera);
+  if (!renderer.setup()) {
+    fprintf(stderr, "Renderer setup failed!\n");
+  }
 
   // cube creation
   std::vector<Vertex> cube_vertices;
   std::vector<uint> cube_indices;
   get_cube_geometry(1, cube_vertices, cube_indices);
   Mesh cube_mesh = Mesh(cube_vertices, cube_indices);
-  renderer.add_mesh_to_scene(cube_mesh);
+  Model cube = Model();
+  cube.add_mesh(cube_mesh);
+  renderer.add_model_to_scene(cube);
 
   while (!window.should_close()) {
     renderer.render_scene();

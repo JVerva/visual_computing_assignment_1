@@ -11,6 +11,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
+#include <string>
 #include <vector>
 
 class Mesh {
@@ -60,41 +61,54 @@ private:
   GLuint vao, vbo, ebo;
 };
 
-class Renderer {
+class Model {
 private:
   std::vector<Mesh> meshes;
-  std::vector<Shader> shader_programs;
-  Camera camera;
+  glm::mat4 model_transform = glm::mat4(1);
 
 public:
-  void setup(Camera camera_) {
-    shader_programs.push_back(
-        Shader("src/vert/vertex.vert", "src/frag/triangle.frag"));
-    shader_programs[0].build();
-    camera = camera_;
-  }
-
-  void add_mesh_to_scene(Mesh &mesh) {
+  void add_mesh(Mesh &mesh) {
     mesh.setup();
     meshes.push_back(mesh);
   }
 
+  void draw(Shader &shader) {
+    shader.set_matrix_4f("model", model_transform);
+    for (Mesh mesh : meshes) {
+      mesh.draw(shader);
+    }
+  }
+};
+
+class Renderer {
+private:
+  std::vector<Model> models;
+  Shader shader = Shader(std::string(PROJECT_DIR) + "/src/vert/vertex.vert",
+                         std::string(PROJECT_DIR) + "/src/frag/triangle.frag");
+  Camera camera;
+
+public:
+  Renderer(Camera camera_) : camera(camera_) {}
+
+  bool setup() { return shader.build(); }
+
+  void add_model_to_scene(Model &model) { models.push_back(model); }
+
   void render_scene() {
     glClear(GL_COLOR_BUFFER_BIT);
-    if (shader_programs.empty()) {
-      fprintf(stderr, "No shader programs built, please setup the rederer!");
+    if (!shader.is_built) {
+      fprintf(stderr, "No shader programs built, please setup the rederer!\n");
       return;
     }
-    Shader shader = shader_programs[0];
     shader.use();
 
     glm::mat4 model = glm::mat4(1);
+    shader.set_matrix_4f("view", camera.get_view_matrix());
+    shader.set_matrix_4f("projection", camera.get_projection_matrix());
     shader.set_matrix_4f("model", model);
-    shader.set_matrix_4f("view", camera.getViewMatrix());
-    shader.set_matrix_4f("projection", camera.getProjectionMartix());
 
-    for (Mesh mesh : meshes) {
-      mesh.draw(shader_programs[0]);
+    for (Model model : models) {
+      model.draw(shader);
     }
   }
 };
