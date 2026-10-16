@@ -10,6 +10,7 @@
 #include <glad/glad.h>
 #include <glm/detail/qualifier.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -30,8 +31,58 @@ struct DirectionalLight {
   glm::vec3 specular;
 };
 
+class Background {
+public:
+  GLuint texture;
+
+  void setup() {
+    // gen bind and fill vertex array, vertex buffer object and elemenr buffer
+    // object
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(glm::vec2), vertices,
+                 GL_STATIC_DRAW);
+
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), indices,
+                 GL_STATIC_DRAW);
+
+    // specify how to read vertex buffer object in vertex array
+    // vertex positions
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2),
+                          (void *)0);
+
+    glBindVertexArray(0);
+  }
+
+  void draw(Shader &shader) {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    shader.set_int("background", 1);
+
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(0);
+  }
+
+private:
+  glm::vec2 vertices[4] = {glm::vec2(0.0, 0.0), glm::vec2(1.0, 0.0),
+                           glm::vec2(1.0, 1.0), glm::vec2(0.0, 1.0)};
+  GLuint indices[6] = {0, 1, 2, 2, 3, 0};
+
+  GLuint vao, vbo, ebo;
+};
+
 class Mesh {
 public:
+  Mesh();
   Mesh(const std::vector<Vertex> &vertices_, const std::vector<uint> &indices_,
        const Material &material_)
       : vertices(vertices_), indices(indices_), material(material_) {}
@@ -97,7 +148,7 @@ private:
   glm::mat4 model_transform = glm::mat4(1);
 
 public:
-  void add_mesh(Mesh &mesh) {
+  void add_mesh(Mesh mesh) {
     mesh.setup();
     meshes.push_back(mesh);
   }
@@ -131,32 +182,16 @@ class Renderer {
 private:
   std::vector<Model> models;
   DirectionalLight light;
+  Background background = Background();
+  bool is_rendering_background = false;
+  Shader background_shader =
+      Shader(std::string(PROJECT_DIR) + "/src/vert/back.vert",
+             std::string(PROJECT_DIR) + "/src/frag/back.frag");
   Shader shader = Shader(std::string(PROJECT_DIR) + "/src/vert/vertex.vert",
                          std::string(PROJECT_DIR) + "/src/frag/fragment.frag");
   Camera camera;
 
-public:
-  Renderer(Camera camera_) : camera(camera_) {}
-
-  bool setup() {
-
-    glClearColor(red_channel(gruvbox::bg), green_channel(gruvbox::bg),
-                 blue_channel(gruvbox::bg), 1);
-    glEnable(GL_DEPTH_TEST);
-    return shader.build();
-  }
-
-  void add_model_to_scene(Model &model) { models.push_back(model); }
-
-  void set_scene_light(DirectionalLight &light_) { light = light_; }
-
-  void render_scene() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    if (!shader.is_built) {
-      fprintf(stderr, "No shader programs built, please setup the rederer!\n");
-      return;
-    }
+  void render_models() {
     shader.use();
 
     shader.set_matrix_4f("view", camera.get_view_matrix());
@@ -171,6 +206,53 @@ public:
     for (Model model : models) {
       model.draw(shader);
     }
+  }
+
+  void render_background() {
+    glDisable(GL_DEPTH_TEST);
+    background_shader.use();
+    background.draw(background_shader);
+    glEnable(GL_DEPTH_TEST);
+  }
+
+public:
+  Renderer(Camera camera_) : camera(camera_) {}
+
+  bool setup() {
+
+    glClearColor(red_channel(gruvbox::bg), green_channel(gruvbox::bg),
+                 blue_channel(gruvbox::bg), 1);
+    glEnable(GL_DEPTH_TEST);
+
+    background.setup();
+
+    return shader.build() && background_shader.build();
+  }
+
+  void add_model_to_scene(Model &model) { models.push_back(model); }
+
+  void set_scene_light(DirectionalLight &light_) { light = light_; }
+
+  void set_back_ground_texture(GLuint &id) {
+    background.texture = id;
+    is_rendering_background = true;
+  }
+
+  void remove_background_texture() { is_rendering_background = false; }
+
+  void render_scene() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (!shader.is_built || !background_shader.is_built) {
+      fprintf(
+          stderr,
+          "Shader programs not built properly, please setup the rederer!\n");
+      return;
+    }
+    if (is_rendering_background) {
+      render_background();
+    }
+    render_models();
   }
 };
 

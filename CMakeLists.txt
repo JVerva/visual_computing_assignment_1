@@ -15,10 +15,10 @@ FetchContent_MakeAvailable(glad)
 
 # 3. Create your executable
 add_executable(triangle_render src/triangle_render.cpp)
-add_executable(engine src/main.cpp src/computer_vision.cpp)
+add_executable(engine src/main.cpp src/computer_vision.cpp src/stb_image.cpp)
 
 
-target_compile_definitions(engine PRIVATE PROJECT_DIR="${CMAKE_SOURCE_DIR}")
+target_compile_definitions(engine PUBLIC PROJECT_DIR="${CMAKE_SOURCE_DIR}")
 
 target_include_directories(triangle_render PRIVATE ${glm_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}

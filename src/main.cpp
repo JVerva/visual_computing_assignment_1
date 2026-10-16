@@ -32,6 +32,11 @@ int main() {
     return -1;
   }
 
+  GLuint background_texture;
+  texture_manager.load_texture_from_file(
+      std::string(PROJECT_DIR) + "/assets/images/calibration/calibration_0.jpg",
+      background_texture);
+
   DirectionalLight light;
   light.direction = glm::normalize(glm::vec3(0, -1.0, 1.0));
   light.ambient = glm::vec3(0.2);
@@ -58,14 +63,15 @@ int main() {
 
   cube.add_mesh(cube_mesh);
   // test transformations
-  glm::vec3 translation = glm::vec3(0, 0.5, 0);
-  glm::vec3 scaling = glm::vec3(1, 1, 1);
-  glm::vec3 rotation = glm::vec3(0, 0.3, 0);
+  glm::vec3 translation = glm::vec3(-1, -1, -1);
+  glm::vec3 scaling = glm::vec3(2);
+  glm::vec3 rotation = glm::vec3(0.3, 0.3, 0);
   cube.move(translation);
   cube.rotate(rotation);
   cube.scale(scaling);
   // add cube to scene
   renderer.add_model_to_scene(cube);
+  renderer.set_back_ground_texture(background_texture);
 
   while (!window.should_close()) {
     renderer.render_scene();

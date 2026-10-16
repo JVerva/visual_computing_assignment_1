@@ -107,6 +107,11 @@ public:
     int location = glGetUniformLocation(id, uniform_name.c_str());
     glUniform3f(location, vector.x, vector.y, vector.z);
   }
+
+  void set_vec2(const std::string &uniform_name, const glm::vec2 &vector) {
+    int location = glGetUniformLocation(id, uniform_name.c_str());
+    glUniform2f(location, vector.x, vector.y);
+  }
   void use() { glUseProgram(id); }
 };
 

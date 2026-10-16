@@ -25,6 +25,7 @@ public:
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, channels;
+    stbi_set_flip_vertically_on_load_thread(true);
     unsigned char *data =
         stbi_load(path.c_str(), &width, &height, &channels, 0);
     if (data) {
