@@ -7,7 +7,29 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <map>
+#include <opencv2/core/mat.hpp>
 #include <string>
+
+static void create_default_texture(GLuint &id) {
+  glGenTextures(1, &id);
+  glBindTexture(GL_TEXTURE_2D, id);
+  // set the texture wrapping/filtering options (on currently bound texture)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+static void write_image_to_texture(GLuint &id, const cv::Mat &image) {
+  glBindTexture(GL_TEXTURE_2D, id);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.cols, image.rows, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, image.data);
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 class TextureManager {
 public:
@@ -16,13 +38,8 @@ public:
       id = file_loaded_textures[path];
       return true;
     }
-    glGenTextures(1, &id);
+    create_default_texture(id);
     glBindTexture(GL_TEXTURE_2D, id);
-    // set the texture wrapping/filtering options (on currently bound texture)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, channels;
     stbi_set_flip_vertically_on_load_thread(true);
@@ -45,13 +62,8 @@ public:
       id = color_loaded_textures[color];
       return;
     }
-    glGenTextures(1, &id);
+    create_default_texture(id);
     glBindTexture(GL_TEXTURE_2D, id);
-    // set the texture wrapping/filtering options (on currently bound texture)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     unsigned char data[] = {i_red_channel(color), i_green_channel(color),
                             i_blue_channel(color)};

@@ -1,4 +1,5 @@
 #include "camera.hpp"
+#include "computer_vision.hpp"
 #include "geometry.hpp"
 #include "renderer.hpp"
 #include "texture_manager.hpp"
@@ -16,7 +17,7 @@
 
 int main() {
   // component initialization
-  Window window = Window("Calibration", 980, 620);
+  Window window = Window("Calibration", 640, 480);
   if (!window.init()) {
     fprintf(stderr, "Failed to initialize window!\n");
     return -1;
@@ -32,10 +33,14 @@ int main() {
     return -1;
   }
 
+  WebcamCapturePipeline webcam = WebcamCapturePipeline();
+  if (!webcam.setup()) {
+    fprintf(stderr, "Failed to initialize webcam capture!\n");
+    return -1;
+  }
+
   GLuint background_texture;
-  texture_manager.load_texture_from_file(
-      std::string(PROJECT_DIR) + "/assets/images/calibration/calibration_0.jpg",
-      background_texture);
+  create_default_texture(background_texture);
 
   DirectionalLight light;
   light.direction = glm::normalize(glm::vec3(0, -1.0, 1.0));
@@ -71,9 +76,12 @@ int main() {
   cube.scale(scaling);
   // add cube to scene
   renderer.add_model_to_scene(cube);
-  renderer.set_back_ground_texture(background_texture);
 
   while (!window.should_close()) {
+    webcam.update_frame();
+    write_image_to_texture(background_texture, webcam.frame);
+    renderer.set_back_ground_texture(background_texture);
+
     renderer.render_scene();
     window.swap_buffers();
     window.poll_events();
