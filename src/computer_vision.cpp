@@ -3,14 +3,44 @@
 
 namespace fs = std::filesystem;
 
-static void load_directory_images(const std::string &path,
-                                  std::vector<cv::Mat> &images) {
-  for (const fs::directory_entry &entry : fs::directory_iterator(path)) {
-    images.push_back(cv::imread(entry.path()));
+bool load_directory_images(const std::string &path,
+                           std::vector<cv::Mat> &images) {
+  if (!fs::exists(path) || !fs::is_directory(path)) {
+    fprintf(stderr, "Path does not exist or is not a directory: %s\n",
+            path.c_str());
+    return false;
   }
+
+  bool success = true;
+  size_t initial_count = images.size();
+
+  for (const fs::directory_entry &entry : fs::directory_iterator(path)) {
+    if (!entry.is_regular_file()) {
+      continue;
+    }
+
+    cv::Mat img = cv::imread(entry.path().string());
+
+    if (img.empty()) {
+      fprintf(stderr, "Failed to load image file: %s\n",
+              entry.path().string().c_str());
+      success = false;
+      continue;
+    }
+
+    images.push_back(img);
+  }
+
+  // Check if we actually loaded anything from the directory
+  if (images.size() == initial_count) {
+    fprintf(stderr, "No valid images found in directory: %s\n", path.c_str());
+    return false;
+  }
+
+  return success;
 }
 
-static bool find_refined_chessboard_corners(
+bool find_refined_chessboard_corners(
     const cv::Mat &image, const cv::Size &pattern_size,
     std::vector<cv::Point2f> &corners, const cv::Size &refinement_win_size,
     const cv::Size &refinement_zero_zone,
@@ -29,8 +59,8 @@ static bool find_refined_chessboard_corners(
   return success;
 }
 
-static void obj_points_from_pattern(const cv::Size &size,
-                                    std::vector<cv::Point3f> &obj_points) {
+void obj_points_from_pattern(const cv::Size &size,
+                             std::vector<cv::Point3f> &obj_points) {
   for (int y = 0; y < size.height; y++) {
     for (int x = 0; x < size.width; x++) {
       obj_points.push_back(cv::Point3f(float(x), float(y), 0.0));
@@ -38,7 +68,7 @@ static void obj_points_from_pattern(const cv::Size &size,
   }
 }
 
-static bool calibrate_camera_from_chessboard_images(
+bool calibrate_camera_from_chessboard_images(
     const std::vector<cv::Mat> &images, const cv::Size &pattern_size,
     cv::Mat &cam, std::vector<double> &dist_coefs,
     std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs) {

@@ -14,6 +14,7 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -145,7 +146,7 @@ private:
 class Model {
 private:
   std::vector<Mesh> meshes;
-  glm::mat4 model_transform = glm::mat4(1);
+  glm::mat4 transform = glm::mat4(1);
 
 public:
   void add_mesh(Mesh mesh) {
@@ -154,24 +155,21 @@ public:
   }
 
   void rotate(const glm::vec3 &angles) {
-    model_transform =
-        glm::rotate(model_transform, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    model_transform =
-        glm::rotate(model_transform, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    model_transform =
-        glm::rotate(model_transform, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::rotate(transform, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    transform = glm::rotate(transform, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    transform = glm::rotate(transform, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
   }
 
   void scale(const glm::vec3 &scale_factor) {
-    model_transform = glm::scale(model_transform, scale_factor);
+    transform = glm::scale(transform, scale_factor);
   }
 
   void move(const glm::vec3 &translation) {
-    model_transform = glm::translate(model_transform, translation);
+    transform = glm::translate(transform, translation);
   }
 
   void draw(Shader &shader) {
-    shader.set_matrix_4f("model", model_transform);
+    shader.set_matrix_4f("model", transform);
     for (Mesh mesh : meshes) {
       mesh.draw(shader);
     }
@@ -189,14 +187,14 @@ private:
              std::string(PROJECT_DIR) + "/src/frag/back.frag");
   Shader shader = Shader(std::string(PROJECT_DIR) + "/src/vert/vertex.vert",
                          std::string(PROJECT_DIR) + "/src/frag/fragment.frag");
-  Camera camera;
+  std::shared_ptr<Camera> camera;
 
   void render_models() {
     shader.use();
 
-    shader.set_matrix_4f("view", camera.get_view_matrix());
-    shader.set_matrix_4f("projection", camera.get_projection_matrix());
-    shader.set_vec3("view_position", camera.camera_pos);
+    shader.set_matrix_4f("view", camera->get_view_matrix());
+    shader.set_matrix_4f("projection", camera->get_projection_matrix());
+    shader.set_vec3("view_position", camera->get_position());
 
     shader.set_vec3("light.direction", light.direction);
     shader.set_vec3("light.ambient", light.ambient);
@@ -216,7 +214,7 @@ private:
   }
 
 public:
-  Renderer(Camera camera_) : camera(camera_) {}
+  Renderer(std::shared_ptr<Camera> camera_) { camera = camera_; }
 
   bool setup() {
 

@@ -9,8 +9,8 @@
 // declarations
 enum Filter { NONE, GRAYSCALE, GAUSSIAN_BLUR, SOBEL, SHARPEN };
 
-static void load_directory_images(const std::string &path,
-                                  std::vector<cv::Mat> &images);
+bool load_directory_images(const std::string &path,
+                           std::vector<cv::Mat> &images);
 
 static bool find_refined_chessboard_corners(
     const cv::Mat &image, const cv::Size &pattern_size,
@@ -23,12 +23,12 @@ static bool find_refined_chessboard_corners(
 static void obj_points_from_pattern(const cv::Size &size,
                                     std::vector<cv::Point3f> &obj_points);
 
-static bool calibrate_camera_from_chessboard_images(
+bool calibrate_camera_from_chessboard_images(
     const std::vector<cv::Mat> &images, const cv::Size &pattern_size,
     cv::Mat &cam, std::vector<double> &dist_coefs,
     std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs);
 
-static void transform_frame(cv::Mat in_frame, cv::Mat &out_frame,
+static void transform_image(cv::Mat in_frame, cv::Mat &out_frame,
                             Filter filter) {
   // transfrom og frame
   cv::Mat s_x;
@@ -82,7 +82,7 @@ public:
   bool update_frame() {
     bool ret = capture.read(frame);
     if (ret && !frame.empty()) {
-      transform_frame(frame, frame, filter);
+      transform_image(frame, frame, filter);
       cv::flip(frame, frame, -1);
 
       cv::Mat rgb_frame;
@@ -91,7 +91,7 @@ public:
     return ret;
   }
 
-  void set_filter(Filter &filter_) { filter = filter_; }
+  void set_filter(Filter filter_) { filter = filter_; }
 };
 
 #endif

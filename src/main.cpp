@@ -1,16 +1,20 @@
 #include "camera.hpp"
 #include "computer_vision.hpp"
 #include "geometry.hpp"
+#include "input_manager.hpp"
 #include "renderer.hpp"
 #include "texture_manager.hpp"
 #include "themes.hpp"
 #include "window.hpp"
 #include <GLFW/glfw3.h>
+#include <any>
 #include <cstdio>
 #include <glm/detail/qualifier.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/constants.hpp>
+#include <memory>
+#include <opencv2/core/mat.hpp>
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
@@ -22,12 +26,14 @@ int main() {
     fprintf(stderr, "Failed to initialize window!\n");
     return -1;
   }
+  InputManager input_manager = InputManager(window);
 
-  TextureManager texture_manager;
+  TextureManager texture_manager = TextureManager();
 
-  Camera camera = Camera();
+  std::shared_ptr<Camera> camera = std::make_shared<Camera>();
+  camera->move(glm::vec3(-3, -1, 9));
 
-  Renderer renderer(camera);
+  Renderer renderer = Renderer(camera);
   if (!renderer.setup()) {
     fprintf(stderr, "Renderer setup failed!\n");
     return -1;
@@ -38,6 +44,12 @@ int main() {
     fprintf(stderr, "Failed to initialize webcam capture!\n");
     return -1;
   }
+
+  std::string calibration_dir =
+      std::string(PROJECT_DIR) + "/assets/images/calibration";
+  std::vector<cv::Mat> calibration_images;
+  load_directory_images(calibration_dir, calibration_images);
+  cv::Size pattern_size = cv::Size(4, 4);
 
   GLuint background_texture;
   create_default_texture(background_texture);
@@ -77,14 +89,37 @@ int main() {
   // add cube to scene
   renderer.add_model_to_scene(cube);
 
+  double delta_t;
+  double last_frame_t = glfwGetTime();
   while (!window.should_close()) {
+    delta_t = last_frame_t - glfwGetTime();
     webcam.update_frame();
     write_image_to_texture(background_texture, webcam.frame);
     renderer.set_back_ground_texture(background_texture);
 
+    // input actions, to be removed later when engine architecture is defined
+    // webcam
+    if (input_manager.is_just_pressed(GLFW_KEY_0))
+      webcam.set_filter(Filter::NONE);
+    if (input_manager.is_just_pressed(GLFW_KEY_1))
+      webcam.set_filter(Filter::GRAYSCALE);
+    if (input_manager.is_just_pressed(GLFW_KEY_2))
+      webcam.set_filter(Filter::GAUSSIAN_BLUR);
+    if (input_manager.is_just_pressed(GLFW_KEY_3))
+      webcam.set_filter(Filter::SHARPEN);
+    if (input_manager.is_just_pressed(GLFW_KEY_4))
+      webcam.set_filter(Filter::SOBEL);
+    // camera
+    if (input_manager.is_just_pressed(GLFW_KEY_C)) {
+      if (!camera->calibrate(calibration_images, pattern_size)) {
+        fprintf(stderr, "Failed calibration!\n");
+      }
+    }
     renderer.render_scene();
+    input_manager.update();
     window.swap_buffers();
     window.poll_events();
+    last_frame_t = glfwGetTime();
   }
 
   window.close();
