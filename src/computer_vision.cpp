@@ -1,5 +1,8 @@
 #include "computer_vision.hpp"
+#include <cstdio>
 #include <filesystem>
+#include <opencv2/core/mat.hpp>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -50,6 +53,7 @@ bool find_refined_chessboard_corners(
   cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
   // find the corners
   bool success = cv::findChessboardCorners(gray, pattern_size, corners);
+
   // refine them
   if (success) {
     cv::cornerSubPix(gray, corners, refinement_win_size, refinement_zero_zone,
@@ -71,7 +75,8 @@ void obj_points_from_pattern(const cv::Size &size,
 bool calibrate_camera_from_chessboard_images(
     const std::vector<cv::Mat> &images, const cv::Size &pattern_size,
     cv::Mat &cam, std::vector<double> &dist_coefs,
-    std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs) {
+    std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs,
+    bool debug, const std::string &debug_path) {
   cv::Size img_size;
   if (images.empty() || pattern_size.area() <= 0) {
     return false;
@@ -81,13 +86,22 @@ bool calibrate_camera_from_chessboard_images(
   std::vector<std::vector<cv::Point3f>> obj_points;
   std::vector<std::vector<cv::Point2f>> img_points;
   // get image points and obj points per image
+
   for (cv::Mat image : images) {
     std::vector<cv::Point2f> corners;
     success = find_refined_chessboard_corners(image, pattern_size, corners);
     // skip this image if cant find checkerboard points
     if (!success) {
-      fprintf(stderr, "Coulden't find checkerboard corners for image!");
+      fprintf(stderr, "Coulden't find checkerboard corners for image!\n");
       continue;
+    }
+    if (debug) {
+      cv::Mat debug_image = image.clone();
+      cv::drawChessboardCorners(debug_image, pattern_size, corners, success);
+      cv::imwrite(debug_path + "chess_" + std::to_string(img_points.size()) +
+                      ".jpg",
+                  debug_image);
+      fprintf(stdout, "Pattern found and debug image writen!\n");
     }
     img_points.push_back(corners);
     // get obj obj_points
@@ -95,9 +109,12 @@ bool calibrate_camera_from_chessboard_images(
     obj_points_from_pattern(pattern_size, points);
     obj_points.push_back(points);
   }
+  if (img_points.empty() || img_points.size() != obj_points.size()) {
+    return false;
+  }
   // get camera calibration outputs
   cv::calibrateCamera(obj_points, img_points, img_size, cam, dist_coefs,
                       rotation_vecs, trans_vecs);
 
-  return success;
+  return true;
 }

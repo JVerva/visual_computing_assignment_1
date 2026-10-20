@@ -62,9 +62,9 @@ public:
     std::vector<double> dist_coefs;
     std::vector<cv::Mat> rotation_vecs;
     std::vector<cv::Mat> trans_vecs;
-    if (!calibrate_camera_from_chessboard_images(images, pattern_size,
-                                                 intrinsic, dist_coefs,
-                                                 rotation_vecs, trans_vecs))
+    if (!calibrate_camera_from_chessboard_images(
+            images, pattern_size, intrinsic, dist_coefs, rotation_vecs,
+            trans_vecs, true))
       return false;
 
     focal_length.x = (float)intrinsic.at<double>(0, 0);

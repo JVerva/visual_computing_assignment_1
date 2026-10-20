@@ -7,7 +7,6 @@
 #include "themes.hpp"
 #include "window.hpp"
 #include <GLFW/glfw3.h>
-#include <any>
 #include <cstdio>
 #include <glm/detail/qualifier.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
@@ -49,7 +48,7 @@ int main() {
       std::string(PROJECT_DIR) + "/assets/images/calibration";
   std::vector<cv::Mat> calibration_images;
   load_directory_images(calibration_dir, calibration_images);
-  cv::Size pattern_size = cv::Size(4, 4);
+  cv::Size pattern_size = cv::Size(9, 6);
 
   GLuint background_texture;
   create_default_texture(background_texture);

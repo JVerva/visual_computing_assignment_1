@@ -26,7 +26,10 @@ static void obj_points_from_pattern(const cv::Size &size,
 bool calibrate_camera_from_chessboard_images(
     const std::vector<cv::Mat> &images, const cv::Size &pattern_size,
     cv::Mat &cam, std::vector<double> &dist_coefs,
-    std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs);
+    std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs,
+    bool debug = false,
+    const std::string &image_debug_path = std::string(PROJECT_DIR) +
+                                          "/assets/images/debug/");
 
 static void transform_image(cv::Mat in_frame, cv::Mat &out_frame,
                             Filter filter) {
