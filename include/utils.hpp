@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <fstream>
+#include <glm/glm.hpp>
+#include <opencv2/core/matx.hpp>
 #include <sstream>
 #include <string>
 
@@ -41,6 +43,10 @@ static constexpr std::uint8_t i_green_channel(std::uint32_t color) {
 
 static constexpr std::uint8_t i_blue_channel(std::uint32_t color) {
   return static_cast<std::uint8_t>(color & 0xff);
+}
+
+static glm::vec3 cv_to_glm_vec3(cv::Vec3f vec) {
+  return glm::vec3(vec[0], -vec[1], -vec[2]);
 }
 
 #endif

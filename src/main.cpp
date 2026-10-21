@@ -14,6 +14,8 @@
 #include <glm/gtc/constants.hpp>
 #include <memory>
 #include <opencv2/core/mat.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
@@ -30,7 +32,8 @@ int main() {
   TextureManager texture_manager = TextureManager();
 
   std::shared_ptr<Camera> camera = std::make_shared<Camera>();
-  camera->move(glm::vec3(-3, -1, 9));
+  camera->set_position(glm::vec3(0, 15, 0));
+  camera->set_rotation(glm::vec3(-3.14 / 2, 0.0, 0.0));
 
   Renderer renderer = Renderer(camera);
   if (!renderer.setup()) {
@@ -75,16 +78,16 @@ int main() {
   cube_material.shininess = 32;
   // model
   Mesh cube_mesh = Mesh(cube_vertices, cube_indices, cube_material);
-  Model cube = Model();
+  std::shared_ptr<Model> cube = std::make_shared<Model>();
 
-  cube.add_mesh(cube_mesh);
+  cube->add_mesh(cube_mesh);
   // test transformations
-  glm::vec3 translation = glm::vec3(-1, -1, -1);
-  glm::vec3 scaling = glm::vec3(2);
-  glm::vec3 rotation = glm::vec3(0.3, 0.3, 0);
-  cube.move(translation);
-  cube.rotate(rotation);
-  cube.scale(scaling);
+  glm::vec3 translation = glm::vec3(0, 0, 0);
+  glm::vec3 scaling = glm::vec3(1);
+  glm::vec3 rotation = glm::vec3(0, 0, 0);
+  cube->move(translation);
+  cube->rotate(rotation);
+  cube->scale(scaling);
   // add cube to scene
   renderer.add_model_to_scene(cube);
 

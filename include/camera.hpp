@@ -1,17 +1,32 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include "computer_vision.hpp"
+#include "utils.hpp"
 #include <glm/detail/qualifier.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/quaternion_transform.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <glm/matrix.hpp>
+#include <iostream>
 #include <opencv2/core/mat.hpp>
+#include <opencv2/core/matx.hpp>
 #include <vector>
+
+struct CalibrationInfo {
+  std::vector<cv::Mat> images;
+  cv::Mat intrinsic;
+  std::vector<double> dist_coefs;
+  std::vector<cv::Mat> rotation_vecs;
+  std::vector<cv::Mat> trans_vecs;
+};
 
 class Camera {
 private:
@@ -26,17 +41,38 @@ private:
 
 public:
   glm::mat4 transform = glm::mat4(1);
+  CalibrationInfo calibration_info;
 
   Camera() {}
 
-  void rotate(const glm::vec3 &angles) {
-    transform = glm::rotate(transform, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    transform = glm::rotate(transform, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    transform = glm::rotate(transform, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
+  void rotate(const glm::vec3 &rotation) {
+    float magnitude = glm::length(rotation);
+    glm::vec3 axis = glm::normalize(rotation);
+    transform = glm::rotate(transform, magnitude, axis);
   }
 
   void move(const glm::vec3 &translation) {
     transform = glm::translate(transform, translation);
+  }
+
+  void set_position(const glm::vec3 &translation) {
+    transform[3][0] = 0;
+    transform[3][1] = 0;
+    transform[3][2] = 0;
+    move(translation);
+  }
+
+  void set_rotation(const glm::vec3 &rotation) {
+    transform[0][0] = 1;
+    transform[0][1] = 0;
+    transform[0][2] = 0;
+    transform[1][0] = 0;
+    transform[1][1] = 1;
+    transform[1][2] = 0;
+    transform[2][0] = 0;
+    transform[2][1] = 0;
+    transform[2][2] = 1;
+    rotate(rotation);
   }
 
   glm::vec3 get_position() {
@@ -58,20 +94,19 @@ public:
   }
 
   bool calibrate(std::vector<cv::Mat> &images, cv::Size &pattern_size) {
-    cv::Mat intrinsic;
-    std::vector<double> dist_coefs;
-    std::vector<cv::Mat> rotation_vecs;
-    std::vector<cv::Mat> trans_vecs;
     if (!calibrate_camera_from_chessboard_images(
-            images, pattern_size, intrinsic, dist_coefs, rotation_vecs,
-            trans_vecs, true))
+            images, pattern_size, calibration_info.intrinsic,
+            calibration_info.dist_coefs, calibration_info.rotation_vecs,
+            calibration_info.trans_vecs, calibration_info.images, true))
       return false;
+    focal_length =
+        glm::vec2((float)calibration_info.intrinsic.at<double>(0, 0),
+                  (float)calibration_info.intrinsic.at<double>(1, 1));
 
-    focal_length.x = (float)intrinsic.at<double>(0, 0);
-    focal_length.y = (float)intrinsic.at<double>(1, 1);
-    offset = glm::vec2((float)intrinsic.at<double>(0, 2),
-                       (float)intrinsic.at<double>(1, 2));
-
+    offset = glm::vec2(
+        resolution.x - (float)calibration_info.intrinsic.at<double>(0, 2),
+        resolution.y - (float)calibration_info.intrinsic.at<double>(1, 2));
+    std::cout << glm::to_string(offset) << std::endl;
     return true;
   }
 };

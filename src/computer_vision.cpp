@@ -1,8 +1,12 @@
 #include "computer_vision.hpp"
 #include <cstdio>
 #include <filesystem>
+#include <opencv2/core.hpp>
 #include <opencv2/core/mat.hpp>
+#include <opencv2/core/matx.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -22,8 +26,7 @@ bool load_directory_images(const std::string &path,
       continue;
     }
 
-    cv::Mat img = cv::imread(entry.path().string());
-
+    cv::Mat img = cv::imread(entry.path().string(), cv::IMREAD_COLOR_RGB);
     if (img.empty()) {
       fprintf(stderr, "Failed to load image file: %s\n",
               entry.path().string().c_str());
@@ -76,7 +79,8 @@ bool calibrate_camera_from_chessboard_images(
     const std::vector<cv::Mat> &images, const cv::Size &pattern_size,
     cv::Mat &cam, std::vector<double> &dist_coefs,
     std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs,
-    bool debug, const std::string &debug_path) {
+    std::vector<cv::Mat> &used_images, bool debug,
+    const std::string &debug_path) {
   cv::Size img_size;
   if (images.empty() || pattern_size.area() <= 0) {
     return false;
@@ -103,6 +107,7 @@ bool calibrate_camera_from_chessboard_images(
                   debug_image);
       fprintf(stdout, "Pattern found and debug image writen!\n");
     }
+    used_images.push_back(image.clone());
     img_points.push_back(corners);
     // get obj obj_points
     std::vector<cv::Point3f> points;

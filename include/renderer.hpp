@@ -12,8 +12,10 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -146,7 +148,9 @@ private:
 class Model {
 private:
   std::vector<Mesh> meshes;
-  glm::mat4 transform = glm::mat4(1);
+  glm::vec3 position{0.0f};
+  glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
+  glm::vec3 scale_factor{1.0f};
 
 public:
   void add_mesh(Mesh mesh) {
@@ -154,22 +158,66 @@ public:
     meshes.push_back(mesh);
   }
 
-  void rotate(const glm::vec3 &angles) {
-    transform = glm::rotate(transform, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    transform = glm::rotate(transform, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    transform = glm::rotate(transform, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
+  // Build the transformation matrix: T * R * S
+  glm::mat4 get_transform() const {
+    return glm::translate(glm::mat4(1.0f), position) *
+           glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.0f), scale_factor);
   }
 
-  void scale(const glm::vec3 &scale_factor) {
-    transform = glm::scale(transform, scale_factor);
-  }
+  const glm::vec3 &get_position() const { return position; }
+
+  const glm::vec3 &get_scale() const { return scale_factor; }
+
+  const glm::quat &get_rotation() const { return rotation; }
 
   void move(const glm::vec3 &translation) {
-    transform = glm::translate(transform, translation);
+    position += rotation * translation;
   }
 
+  void move_global(const glm::vec3 &translation) { position += translation; }
+
+  void set_position(const glm::vec3 &new_position) { position = new_position; }
+
+  // Input: axis-angle vector, angle in radians
+  void rotate(const glm::vec3 &rotation_vector) {
+    float angle = glm::length(rotation_vector);
+    if (angle == 0.0f)
+      return;
+
+    glm::vec3 axis = rotation_vector / angle;
+    glm::quat delta = glm::angleAxis(angle, axis);
+
+    rotation = glm::normalize(rotation * delta);
+  }
+
+  void rotate_global(const glm::vec3 &rotation_vector) {
+    float angle = glm::length(rotation_vector);
+    if (angle == 0.0f)
+      return;
+
+    glm::vec3 axis = rotation_vector / angle;
+    glm::quat delta = glm::angleAxis(angle, axis);
+
+    rotation = glm::normalize(delta * rotation);
+  }
+
+  void set_rotation(const glm::vec3 &rotation_vector) {
+    float angle = glm::length(rotation_vector);
+
+    if (angle == 0.0f) {
+      rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+      return;
+    }
+
+    rotation = glm::angleAxis(angle, rotation_vector / angle);
+  }
+
+  void scale(const glm::vec3 &factors) { scale_factor *= factors; }
+
+  void set_scale(const glm::vec3 &new_scale) { scale_factor = new_scale; }
+
   void draw(Shader &shader) {
-    shader.set_matrix_4f("model", transform);
+    shader.set_matrix_4f("model", get_transform());
     for (Mesh mesh : meshes) {
       mesh.draw(shader);
     }
@@ -178,7 +226,7 @@ public:
 
 class Renderer {
 private:
-  std::vector<Model> models;
+  std::vector<std::shared_ptr<Model>> models;
   DirectionalLight light;
   Background background = Background();
   bool is_rendering_background = false;
@@ -201,8 +249,8 @@ private:
     shader.set_vec3("light.diffuse", light.diffuse);
     shader.set_vec3("light.specular", light.specular);
 
-    for (Model model : models) {
-      model.draw(shader);
+    for (auto model : models) {
+      model->draw(shader);
     }
   }
 
@@ -227,11 +275,13 @@ public:
     return shader.build() && background_shader.build();
   }
 
-  void add_model_to_scene(Model &model) { models.push_back(model); }
+  void add_model_to_scene(std::shared_ptr<Model> model) {
+    models.push_back(model);
+  }
 
   void set_scene_light(DirectionalLight &light_) { light = light_; }
 
-  void set_back_ground_texture(GLuint &id) {
+  void set_back_ground_texture(GLuint id) {
     background.texture = id;
     is_rendering_background = true;
   }

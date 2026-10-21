@@ -1,6 +1,7 @@
 #ifndef COMPUTER_VISION_HPP
 #define COMPUTER_VISION_HPP
 
+#include <opencv2/core/matx.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
 #include <string>
@@ -27,7 +28,7 @@ bool calibrate_camera_from_chessboard_images(
     const std::vector<cv::Mat> &images, const cv::Size &pattern_size,
     cv::Mat &cam, std::vector<double> &dist_coefs,
     std::vector<cv::Mat> &rotation_vecs, std::vector<cv::Mat> &trans_vecs,
-    bool debug = false,
+    std::vector<cv::Mat> &used_images, bool debug = false,
     const std::string &image_debug_path = std::string(PROJECT_DIR) +
                                           "/assets/images/debug/");
 
