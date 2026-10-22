@@ -59,7 +59,7 @@ int main() {
   create_default_texture(background_texture);
 
   DirectionalLight light;
-  light.direction = glm::normalize(glm::vec3(0.0, 0.0, 1.0));
+  light.direction = glm::normalize(glm::vec3(0.0, 0.0, -1.0));
   light.ambient = glm::vec3(0.2);
   light.diffuse = glm::vec3(0.5);
   light.specular = glm::vec3(1.0);
@@ -83,7 +83,7 @@ int main() {
   std::shared_ptr<Model> cube = std::make_shared<Model>();
   cube->add_mesh(cube_mesh);
   cube->scale(glm::vec3(1, 1, 0.1));
-  cube->move(glm::vec3(0.5, 0.5, 0.05));
+  cube->move(-glm::vec3(0.5, 0.5, 0.05));
   // add cube to scene
   renderer.add_model_to_scene(cube);
 
@@ -144,13 +144,13 @@ void show_calibration_scenario(Camera &camera, Renderer &renderer,
   cv::Rodrigues(rvec, R_cv);
 
   // OpenCV camera axes -> OpenGL camera axes
-  cv::Mat S = (cv::Mat_<double>(3, 3) << -1, 0, 0, 0, -1, 0, 0, 0, -1);
+  cv::Mat S = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
 
   // Camera-to-world rotation
   cv::Mat R_camera_gl = R_cv.t() * S;
 
   // Camera position in the calibration pattern's coordinates
-  cv::Mat Cw = -R_cv.t() * tvec;
+  cv::Mat Cw = R_cv.t() * tvec;
 
   // Construct the GLM camera world transform
   glm::mat4 transform(1.0f);

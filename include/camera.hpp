@@ -103,9 +103,9 @@ public:
         glm::vec2((float)calibration_info.intrinsic.at<double>(0, 0),
                   (float)calibration_info.intrinsic.at<double>(1, 1));
 
-    offset = glm::vec2(
-        resolution.x - (float)calibration_info.intrinsic.at<double>(0, 2),
-        resolution.y - (float)calibration_info.intrinsic.at<double>(1, 2));
+    offset = glm::vec2(resolution.x -
+                           (float)calibration_info.intrinsic.at<double>(0, 2),
+                       (float)calibration_info.intrinsic.at<double>(1, 2));
     std::cout << glm::to_string(offset) << std::endl;
     return true;
   }
