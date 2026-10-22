@@ -11,25 +11,34 @@ find_package(OpenCV REQUIRED)
 include(FetchContent)
 
 FetchContent_Declare(glad GIT_REPOSITORY https://github.com/Dav1dde/glad.git)
-
 FetchContent_MakeAvailable(glad)
 
-# 3. Create your executable
-add_executable(triangle_render src/triangle_render.cpp)
-add_executable(calibration src/calibration.cpp)
+add_executable(engine src/main.cpp src/computer_vision.cpp src/stb_image.cpp)
 
-target_include_directories(triangle_render PRIVATE ${glm_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS})
-target_include_directories(calibration PRIVATE ${glm_INCLUDE_DIRS}
+target_compile_definitions(engine PUBLIC PROJECT_DIR="${CMAKE_SOURCE_DIR}")
+
+target_include_directories(engine PRIVATE ${glm_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
+  glad
 )
 
-target_link_libraries(triangle_render PRIVATE
+target_link_libraries(engine PRIVATE
     ${OpenCV_LIBS}
     glfw
     glad
 )
+
+add_executable(calibration src/calibration.cpp src/computer_vision.cpp src/stb_image.cpp)
+
+target_compile_definitions(calibration PUBLIC PROJECT_DIR="${CMAKE_SOURCE_DIR}")
+
+target_include_directories(calibration PRIVATE ${glm_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/include
+  glad
+)
+
 target_link_libraries(calibration PRIVATE
     ${OpenCV_LIBS}
     glfw

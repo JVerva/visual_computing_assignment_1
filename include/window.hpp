@@ -1,4 +1,6 @@
-#include "themes.hpp"
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -13,19 +15,15 @@ class Window {
 private:
   GLFWwindow *window;
   std::string name;
-  int height;
   int width;
-
-  static void key_callback(GLFWwindow *window, int key, int scancode,
-                           int action, int mods) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GLFW_TRUE);
-  }
+  int height;
 
   static void frame_buffer_resize_callbak(GLFWwindow *window, int width,
                                           int height) {
     glViewport(0, 0, width, height);
   }
+
+  friend class InputManager;
 
 public:
   Window(const std::string &name_, int width_, int height_)
@@ -59,8 +57,6 @@ public:
       return false;
     }
     glfwSetFramebufferSizeCallback(window, frame_buffer_resize_callbak);
-    glfwSetKeyCallback(window, key_callback);
-    glClearColor(gruvbox::bg[0], gruvbox::bg[1], gruvbox::bg[2], 1);
 
     return true;
   }
@@ -76,3 +72,5 @@ public:
     glfwTerminate();
   }
 };
+
+#endif
