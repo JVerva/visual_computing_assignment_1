@@ -20,7 +20,7 @@
 #include <string>
 
 #define TRACKER_FEATURES 1000
-#define FEATURE_RATIO 0.5
+#define FEATURE_RATIO 0.7
 const std::string TARGET_IMAGE_PATH =
     std::string(PROJECT_DIR) + "/assets/images/feature_matching/target.png";
 
