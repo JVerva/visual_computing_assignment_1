@@ -74,7 +74,6 @@ public:
   bool setup() {
     // open the default webcam (0)
     capture = cv::VideoCapture(0);
-
     // Check if the video was opened successfully
     if (!capture.isOpened()) {
       fprintf(stderr, "Failed to open video capture\n");

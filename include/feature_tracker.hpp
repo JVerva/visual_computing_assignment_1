@@ -71,7 +71,8 @@ public:
     }
     homography.release();
     if (target_good_points.size() > 3 and input_good_points.size() > 3)
-      homography = cv::findHomography(target_good_points, input_good_points);
+      homography =
+          cv::findHomography(target_good_points, input_good_points, cv::RANSAC);
     if (debug) {
       cv::drawMatches(target_image, target_key_points, image, input_key_points,
                       good_matches, match_image);

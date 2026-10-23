@@ -53,7 +53,7 @@ int main() {
       std::string(PROJECT_DIR) + "/assets/images/calibration";
   std::vector<cv::Mat> calibration_images;
   load_directory_images(calibration_dir, calibration_images);
-  cv::Size pattern_size = cv::Size(9, 6);
+  cv::Size pattern_size = cv::Size(10, 7);
 
   GLuint background_texture;
   create_default_texture(background_texture);
