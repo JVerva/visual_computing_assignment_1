@@ -44,3 +44,20 @@ target_link_libraries(calibration PRIVATE
     glfw
     glad
 )
+
+
+add_executable(feature_tracking src/feature_tracking.cpp src/computer_vision.cpp src/stb_image.cpp)
+
+target_compile_definitions(feature_tracking PUBLIC PROJECT_DIR="${CMAKE_SOURCE_DIR}")
+
+target_include_directories(feature_tracking PRIVATE ${glm_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/include
+  glad
+)
+
+target_link_libraries(feature_tracking PRIVATE
+    ${OpenCV_LIBS}
+    glfw
+    glad
+)
