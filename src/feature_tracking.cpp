@@ -12,13 +12,15 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/constants.hpp>
 #include <memory>
+#include <opencv2/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/opencv.hpp>
 #include <string>
 
-#define TRACKER_FEATURES 2000
+#define TRACKER_FEATURES 1000
+#define FEATURE_RATIO 0.5
 const std::string TARGET_IMAGE_PATH =
     std::string(PROJECT_DIR) + "/assets/images/feature_matching/target.png";
 
@@ -48,8 +50,9 @@ int main() {
   }
 
   cv::Mat target_image = cv::imread(TARGET_IMAGE_PATH);
+  cv::flip(target_image, target_image, -1);
   FeatureTracker feature_tracker =
-      FeatureTracker(TRACKER_FEATURES, target_image);
+      FeatureTracker(TRACKER_FEATURES, target_image, FEATURE_RATIO);
 
   GLuint background_texture;
   create_default_texture(background_texture);
