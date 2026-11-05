@@ -138,27 +138,19 @@ private:
     }
     // create object points, assuming z=0 at image plane
     for (const auto &point : target_inlier_points) {
-      object_points.push_back(
-          cv::Point3f(point.x * target_physical_size.width / target_image.cols,
-                      point.y * target_physical_size.height / target_image.rows,
-                      0.0));
+      object_points.push_back(cv::Point3f(
+          point.x * target_physical_size.width / target_image.cols,
+          point.y * target_physical_size.height / target_image.rows, 0.0));
     }
     cv::solvePnPRansac(object_points, input_inlier_points, intrinsic,
                        distortion_coeffs, rvec, tvec);
     return true;
   }
 
-  bool compute_scale() {
-    if (target_image.empty() or target_physical_size.empty()) {
-      return false;
-    }
-    return true;
-  }
-
 public:
   FeatureTracker(int features, const cv::Mat &target_image,
-                 float physical_width_m = 0.1, float physical_height_m = 0.1,
-                 float match_ratio = 0.8) {
+                 float match_ratio = 0.8, float physical_width_m = 1,
+                 float physical_height_m = 1) {
     detector = cv::SIFT::create(features);
     matcher = cv::BFMatcher::create();
     set_target(target_image, physical_width_m, physical_height_m);
@@ -178,7 +170,6 @@ public:
     edges = {cv::Point2f(0, 0), cv::Point2f(0, target_image.size().height),
              cv::Point2f(target_image.size().width, target_image.size().height),
              cv::Point2f(target_image.size().width, 0)};
-    compute_scale();
   }
 
   void set_camera_calibration(const cv::Mat &intrinsic_,
@@ -189,11 +180,10 @@ public:
 
   void set_target_physical_size(float width_m, float height_m) {
     target_physical_size = cv::Size2f(width_m, height_m);
-    compute_scale();
   }
 
   void set_input_image(const cv::Mat &input_image_) {
-    cv::cvtColor(input_image_, input_image, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(input_image_, input_image, cv::COLOR_RGB2GRAY);
   }
 
   cv::Mat get_match_image() { return match_image; }

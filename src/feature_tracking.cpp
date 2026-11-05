@@ -19,7 +19,7 @@
 #include <opencv2/opencv.hpp>
 #include <string>
 
-#define TRACKER_FEATURES 2000
+#define TRACKER_FEATURES 1000
 #define FEATURE_RATIO 0.8
 const std::string TARGET_IMAGE_PATH =
     std::string(PROJECT_DIR) + "/assets/images/feature_matching/target.png";
@@ -65,7 +65,7 @@ int main() {
 
   cv::Mat target_image = cv::imread(TARGET_IMAGE_PATH);
   FeatureTracker feature_tracker =
-      FeatureTracker(TRACKER_FEATURES, target_image, 1, 1, FEATURE_RATIO);
+      FeatureTracker(TRACKER_FEATURES, target_image, FEATURE_RATIO);
   feature_tracker.set_camera_calibration(camera->calibration_info.intrinsic,
                                          camera->calibration_info.dist_coefs);
   GLuint background_texture;
