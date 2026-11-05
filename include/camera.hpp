@@ -112,7 +112,6 @@ public:
                        (float)calibration_info.intrinsic.at<double>(1, 2));
     resolution = glm::vec2((float)calibration_info.images[0].cols,
                            (float)calibration_info.images[0].rows);
-    std::cout << glm::to_string(offset) << std::endl;
     return true;
   }
 };

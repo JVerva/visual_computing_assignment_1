@@ -60,7 +60,8 @@ private:
     // find good matches via D.Lowie
     for (auto match : matches) {
       if (match.size() != 2) {
-        fprintf(stderr, "Found an incorrect number of matches!\n");
+        fprintf(stderr, "Match has incorrect size: %lu (should be 2)\n",
+                match.size());
         continue;
       }
       if (match[0].distance < good_match_ratio * match[1].distance) {
