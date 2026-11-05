@@ -6,10 +6,11 @@
 #include "renderer.hpp"
 #include "texture_manager.hpp"
 #include "themes.hpp"
+#include "utils.hpp"
 #include "window.hpp"
 #include <GLFW/glfw3.h>
 #include <cstdio>
-#include <iostream>
+#include <glm/ext/matrix_float4x4.hpp>
 #include <opencv2/core.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/detail/qualifier.hpp>
@@ -59,7 +60,7 @@ int main() {
   create_default_texture(background_texture);
 
   DirectionalLight light;
-  light.direction = glm::normalize(glm::vec3(0.0, 0.0, -1.0));
+  light.direction = glm::normalize(glm::vec3(0.0, 0.0, 1.0));
   light.ambient = glm::vec3(0.2);
   light.diffuse = glm::vec3(0.5);
   light.specular = glm::vec3(1.0);
@@ -93,7 +94,7 @@ int main() {
     delta_t = last_frame_t - glfwGetTime();
     // camera
     if (input_manager.is_just_pressed(GLFW_KEY_C)) {
-      if (!camera->calibrate(calibration_images, pattern_size)) {
+      if (!camera->calibrate(calibration_images, pattern_size, true)) {
         fprintf(stderr, "Failed calibration!\n");
       }
       for (int i = 0; i < camera->calibration_info.images.size(); i++) {
@@ -124,46 +125,14 @@ void show_calibration_scenario(Camera &camera, Renderer &renderer,
   GLuint calibration_texture;
   create_default_texture(calibration_texture);
   cv::Mat fliped_img;
-  cv::flip(camera.calibration_info.images[scenario_index], fliped_img, -1);
+  cv::flip(camera.calibration_info.images[scenario_index], fliped_img, 0);
 
   write_image_to_texture(calibration_texture, fliped_img);
   renderer.set_back_ground_texture(calibration_texture);
 
   cv::Mat rvec = camera.calibration_info.rotation_vecs[scenario_index];
   cv::Mat tvec = camera.calibration_info.trans_vecs[scenario_index];
-  /*
-  glm::vec3 pos =
-      glm::vec3((float)-tvec.at<double>(0), (float)-tvec.at<double>(1),
-                (float)-tvec.at<double>(2));
-  std::cout << "rvec:" << tvec << std::endl;
-  std::cout << "pos:" << glm::to_string(pos) << std::endl;
-  cube->set_position(pos);
-  */
 
-  cv::Mat R_cv;
-  cv::Rodrigues(rvec, R_cv);
-
-  // OpenCV camera axes -> OpenGL camera axes
-  cv::Mat S = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
-
-  // Camera-to-world rotation
-  cv::Mat R_camera_gl = R_cv.t() * S;
-
-  // Camera position in the calibration pattern's coordinates
-  cv::Mat Cw = R_cv.t() * tvec;
-
-  // Construct the GLM camera world transform
-  glm::mat4 transform(1.0f);
-
-  for (int row = 0; row < 3; ++row) {
-    for (int col = 0; col < 3; ++col) {
-      transform[col][row] =
-          static_cast<float>(R_camera_gl.at<double>(row, col));
-    }
-  }
-
-  transform[3] = glm::vec4(static_cast<float>(Cw.at<double>(0)),
-                           static_cast<float>(Cw.at<double>(1)),
-                           static_cast<float>(Cw.at<double>(2)), 1.0f);
-  camera.transform = transform;
+  glm::mat4 view = cvt_glm_view(rvec, tvec);
+  camera.set_transform_from_view(view);
 }

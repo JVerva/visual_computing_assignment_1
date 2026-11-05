@@ -178,6 +178,12 @@ public:
 
   void set_position(const glm::vec3 &new_position) { position = new_position; }
 
+  void set_transform(const glm::mat4 &transform) {
+    position = glm::vec3(transform[3]);
+    rotation = glm::quat_cast(transform);
+    scale_factor = glm::vec3(1.0f);
+  }
+
   // Input: axis-angle vector, angle in radians
   void rotate(const glm::vec3 &rotation_vector) {
     float angle = glm::length(rotation_vector);

@@ -75,6 +75,10 @@ public:
     rotate(rotation);
   }
 
+  void set_transform_from_view(const glm::mat4 &view) {
+    transform = glm::inverse(view);
+  }
+
   glm::vec3 get_position() {
     return glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
   }
@@ -86,26 +90,28 @@ public:
     float right =
         (resolution.x - offset.x) * near_plane_distance / focal_length.x;
     float bottom =
-        (-resolution.y + offset.y) * near_plane_distance / focal_length.y;
+        -(resolution.y - offset.y) * near_plane_distance / focal_length.y;
     float top = offset.y * near_plane_distance / focal_length.y;
 
     return glm::frustum(left, right, bottom, top, near_plane_distance,
                         far_plane_distance);
   }
 
-  bool calibrate(std::vector<cv::Mat> &images, cv::Size &pattern_size) {
+  bool calibrate(std::vector<cv::Mat> &images, cv::Size &pattern_size,
+                 bool debug = false) {
     if (!calibrate_camera_from_chessboard_images(
             images, pattern_size, calibration_info.intrinsic,
             calibration_info.dist_coefs, calibration_info.rotation_vecs,
-            calibration_info.trans_vecs, calibration_info.images, true))
+            calibration_info.trans_vecs, calibration_info.images, debug))
       return false;
     focal_length =
         glm::vec2((float)calibration_info.intrinsic.at<double>(0, 0),
                   (float)calibration_info.intrinsic.at<double>(1, 1));
 
-    offset = glm::vec2(resolution.x -
-                           (float)calibration_info.intrinsic.at<double>(0, 2),
+    offset = glm::vec2((float)calibration_info.intrinsic.at<double>(0, 2),
                        (float)calibration_info.intrinsic.at<double>(1, 2));
+    resolution = glm::vec2((float)calibration_info.images[0].cols,
+                           (float)calibration_info.images[0].rows);
     std::cout << glm::to_string(offset) << std::endl;
     return true;
   }

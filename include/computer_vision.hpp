@@ -86,9 +86,6 @@ public:
     bool ret = capture.read(frame);
     if (ret && !frame.empty()) {
       transform_image(frame, frame, filter);
-      cv::flip(frame, frame, -1);
-
-      cv::Mat rgb_frame;
       cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
     }
     return ret;
