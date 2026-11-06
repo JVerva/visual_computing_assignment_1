@@ -1,4 +1,4 @@
-# Visual Computing - Assignment 1
+# Visual Computing - Assignment 1/2
 
 This project contains OpenGL and OpenCV demonstrations developed for the
 Visual Computing course:
