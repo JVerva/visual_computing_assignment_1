@@ -1,136 +1,112 @@
-# OUTDATED
+# Visual Computing - Assignment 1
 
-# About The Project
-Assignment 1 for Visual Computing course.\
-This project renders a triangle (at origin coordinates) in front of a camera (that always looks at origin coordinates) and a background displaying a live webcam capture, mutiple filters can be applied on top of it.\
-The rendering is done with OpenGL and the webcam capture and image filtering with OpenCV.\
-This lays the groundwork for a future augmented reality application.
-# Dependencies
-## vcpkg
+This project contains OpenGL and OpenCV demonstrations developed for the
+Visual Computing course:
 
-This project uses [vcpkg](https://github.com/microsoft/vcpkg) to provide its C++ dependencies. Install vcpkg and set `VCPKG_PATH` to the vcpkg installation directory before configuring CMake.
+- `calibration`: calibrates the camera from the bundled chessboard images and
+  displays the calibration poses one at a time.
+- `feature_tracking`: tracks the bundled target image in the webcam feed and
+  estimates its pose to render a cube.
+- `triangle_render`: the original assignment renderer, which displays a
+  triangle over the webcam feed. It is kept for backwards compatibility.
 
-The vcpkg installation commands differ slightly between operating systems.
+## Dependencies
 
-### Linux and macOS
-Install the required Linux build tools and development libraries:
+The project uses CMake to find the system-installed OpenCV, GLFW, and GLM
+packages. GLAD is downloaded and built automatically by CMake through
+`FetchContent`.
 
-```bash
-sudo apt-get update
-sudo apt-get install bison
-sudo apt-get install autoconf autoconf-archive automake libtool
-sudo apt-get install libdbus-1-dev libxi-dev libxtst-dev
-```
-Clone vcpkg and run its bootstrap script:
-```bash
-git clone https://github.com/microsoft/vcpkg.git /path/to/your/vcpkg
-cd /path/to/your/vcpkg
-./bootstrap-vcpkg.sh
-```
-### Windows
-Clone vcpkg and run its bootstrap script:
-```powershell
-git clone https://github.com/microsoft/vcpkg.git /path/to/your/vcpkg
-cd /path/to/your/vcpkg
-./bootstrap-vcpkg.bat
-```
+### Linux
 
-The following vcpkg packages are required:
-
-- `opencv`: reads the bundled video and applies the image-processing filters.
-- `glad`: loads the OpenGL functions used by the renderer.
-- `glm`: provides the vector and matrix types used for the camera and OpenGL transformations.
-- `glfw3`: creates the application window, OpenGL context, and keyboard input handling.
-
-You also need:
-
-- CMake 3.16 or newer
-- A C++17-compatible compiler
-- An OpenGL 3.3-compatible graphics driver
-
-## Install vcpkg packages
-
-Add the vcpkg installation directory to your `PATH` before running the install command:
-
-### Linux and macOS
-```bash
-export PATH="/path/to/your/vcpkg:$PATH"
-```
-
-### Windows
-
-```powershell
-$env:Path = "C:\path\to\your\vcpkg;$env:Path"
-```
-
-Then install the required packages using vcpkg:
+Install the required tools and development packages:
 
 ```bash
-vcpkg install opencv glad glm glfw3
+sudo apt update
+sudo apt install build-essential cmake git libglfw3-dev libglm-dev libopencv-dev
 ```
 
+### Arch Linux
 
-# Project Setup
+Install the required tools and development packages:
 
-## Clone the repository
+```bash
+sudo pacman -S --needed base-devel cmake git glfw-x11 glm opencv
+```
 
-Run these commands from the directory where you want to clone the repository.
+You also need CMake 3.16 or newer, a C++20-compatible compiler, an OpenGL 3.3
+compatible graphics driver, and a webcam for `feature_tracking`.
+
+The first CMake configuration requires internet access to download GLAD.
+
+## Build
+
+Clone the repository and configure the project from its root directory:
 
 ```bash
 git clone https://github.com/JVerva/visual_computing_assignment_1.git
 cd visual_computing_assignment_1
-```
-
-## Configure and build
-
-Run the following commands from the repository directory:
-
-## Linux and macOS
-
-```bash
-export VCPKG_PATH="/path/to/your/vcpkg"
 cmake -S . -B build
-cmake --build build
+cmake --build build --parallel
 ```
 
-## Windows
+The executables are created in `build/`:
 
-```powershell
-$env:VCPKG_PATH = "/path/to/your/vcpkg"
-cmake -S . -B build -G "Ninja"
-cmake --build build
+```text
+build/calibration
+build/feature_tracking
+build/triangle_render
 ```
 
-The executable is created at `build/triangle_render`.
+## Run
 
-## Run project
+Run any executable with:
 
-Run the executable from the project root so that the relative shader paths resolve correctly:
-
-### On Windows
 ```bash
+./build/calibration
+./build/feature_tracking
 ./build/triangle_render
 ```
 
-### On Windows
-```powershell
-.\build\triangle_render.exe
-```
+The repository path is embedded at configure time, so shaders and bundled
+images are found even when the executables are launched from another
+directory.
 
 ## Controls
 
+### `calibration`
+
+| Key/input | Action |
+| --- | --- |
+| `C` | Run camera calibration |
+| `Enter` in the terminal/console | Advance to the next calibration scenario |
+| `Esc` | Exit |
+
+Calibration pauses after each scenario and waits for an Enter key press on the
+console where the executable was launched.
+
+### `feature_tracking`
+
 | Key | Action |
 | --- | --- |
-|Camera|
+| `0` | Feature-matching view |
+| `1` | Pose-estimation view |
+| `Esc` | Exit |
+
+The camera is calibrated automatically at startup using the images in
+`assets/images/calibration`, and the target image is
+`assets/images/feature_matching/target.png`.
+
+### `triangle_render`
+
+| Key | Action |
+| --- | --- |
 | `W` | Move the camera forward |
 | `S` | Move the camera backward |
 | `A` | Move the camera left |
 | `D` | Move the camera right |
-|Filters|
 | `0` | Disable the image filter |
 | `1` | Apply grayscale |
 | `2` | Apply blur |
 | `3` | Apply Sobel |
 | `4` | Apply sharpen |
-|Window|
-| `Esc` | Exit the application |
+| `Esc` | Exit |

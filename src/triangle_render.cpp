@@ -232,9 +232,11 @@ int main(void) {
   glEnableVertexAttribArray(0);
 
   GLuint triangle_program =
-      create_shader_program("src/vert/triangle.vert", "src/frag/triangle.frag");
+      create_shader_program(std::string(PROJECT_DIR) + "/src/vert/triangle.vert",
+                            std::string(PROJECT_DIR) + "/src/frag/triangle.frag");
   GLuint back_program =
-      create_shader_program("src/vert/back.vert", "src/frag/back.frag");
+      create_shader_program(std::string(PROJECT_DIR) + "/src/vert/back.vert",
+                            std::string(PROJECT_DIR) + "/src/frag/back.frag");
 
   // Ensure we can capture the escape and camera movement keys being pressed
   // below
