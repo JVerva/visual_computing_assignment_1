@@ -7,8 +7,8 @@ Visual Computing course:
   displays the calibration poses one at a time.
 - `feature_tracking`: tracks the bundled target image in the webcam feed and
   estimates its pose to render a cube.
-- `triangle_render`: the original assignment renderer, which displays a
-  triangle over the webcam feed. It is kept for backwards compatibility.
+- `triangle_render`: the 1st assignment renderer, which displays a
+  triangle over the webcam feed.
 
 ## Dependencies
 
@@ -34,7 +34,7 @@ sudo pacman -S --needed base-devel cmake git glfw-x11 glm opencv
 ```
 
 You also need CMake 3.16 or newer, a C++20-compatible compiler, an OpenGL 3.3
-compatible graphics driver, and a webcam for `feature_tracking`.
+compatible graphics driver, and a webcam.
 
 The first CMake configuration requires internet access to download GLAD.
 
