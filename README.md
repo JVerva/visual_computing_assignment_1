@@ -71,6 +71,10 @@ The repository path is embedded at configure time, so shaders and bundled
 images are found even when the executables are launched from another
 directory.
 
+ Sorry for putting
+definitions in header files, I don't love having to change 100 files; this will be corrected in the
+future.
+
 ## Controls
 
 ### `calibration`

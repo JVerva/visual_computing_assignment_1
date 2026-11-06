@@ -13,7 +13,7 @@ include(FetchContent)
 FetchContent_Declare(glad GIT_REPOSITORY https://github.com/Dav1dde/glad.git)
 FetchContent_MakeAvailable(glad)
 
-add_executable(calibration src/calibration.cpp src/computer_vision.cpp src/stb_image.cpp)
+add_executable(calibration src/calibration.cpp src/stb_image.cpp)
 
 target_compile_definitions(calibration PUBLIC PROJECT_DIR="${CMAKE_SOURCE_DIR}")
 
@@ -30,7 +30,7 @@ target_link_libraries(calibration PRIVATE
 )
 
 
-add_executable(feature_tracking src/feature_tracking.cpp src/computer_vision.cpp src/stb_image.cpp)
+add_executable(feature_tracking src/feature_tracking.cpp src/stb_image.cpp)
 
 target_compile_definitions(feature_tracking PUBLIC PROJECT_DIR="${CMAKE_SOURCE_DIR}")
 
@@ -46,7 +46,7 @@ target_link_libraries(feature_tracking PRIVATE
     glad
 )
 
-add_executable(triangle_render src/triangle_render.cpp src/computer_vision.cpp)
+add_executable(triangle_render src/triangle_render.cpp)
 
 target_compile_definitions(triangle_render PUBLIC PROJECT_DIR="${CMAKE_SOURCE_DIR}")
 
