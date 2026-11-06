@@ -3,7 +3,6 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include "computer_vision.hpp"
-#include "utils.hpp"
 #include <glm/detail/qualifier.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -15,7 +14,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/matrix.hpp>
-#include <iostream>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/matx.hpp>
 #include <vector>

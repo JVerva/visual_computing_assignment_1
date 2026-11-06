@@ -84,7 +84,7 @@ int main() {
   std::shared_ptr<Model> cube = std::make_shared<Model>();
   cube->add_mesh(cube_mesh);
   cube->scale(glm::vec3(1, 1, 0.1));
-  cube->move(-glm::vec3(0.5, 0.5, 0.05));
+  cube->move(glm::vec3(0.5, 0.5, -0.05));
   // add cube to scene
   renderer.add_model_to_scene(cube);
 

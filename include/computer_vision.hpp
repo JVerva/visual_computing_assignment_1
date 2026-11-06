@@ -16,7 +16,7 @@ bool load_directory_images(const std::string &path,
 static bool find_refined_chessboard_corners(
     const cv::Mat &image, const cv::Size &pattern_size,
     std::vector<cv::Point2f> &corners,
-    const cv::Size &refinement_win_size = cv::Size(11, 11),
+    const cv::Size &refinement_win_size = cv::Size(5, 5),
     const cv::Size &refinement_zero_zone = cv::Size(-1, -1),
     const cv::TermCriteria &refinement_termination_criteria =
         cv::TermCriteria(30, 0.001));

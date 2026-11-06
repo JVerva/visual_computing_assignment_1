@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdio>
-#include <iostream>
 #include <opencv2/core.hpp>
 #include <opencv2/core/cvstd_wrapper.hpp>
 #include <opencv2/core/mat.hpp>
@@ -10,9 +9,7 @@
 #include <opencv2/features.hpp>
 #include <opencv2/geometry/3d.hpp>
 #include <opencv2/imgproc.hpp>
-#include <ostream>
 #include <tuple>
-#include <utility>
 #include <vector>
 
 // how many matches we take and evaluate, needs to be 2 for D.Lowie testing
@@ -59,7 +56,7 @@ private:
     matcher->knnMatch(target_descriptors, input_descriptors, matches, K);
     // find good matches via D.Lowie
     for (auto match : matches) {
-      if (match.size() != 2) {
+      if (match.size() != K) {
         fprintf(stderr, "Match has incorrect size: %lu (should be 2)\n",
                 match.size());
         continue;

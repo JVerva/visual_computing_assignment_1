@@ -105,7 +105,6 @@ bool calibrate_camera_from_chessboard_images(
       cv::imwrite(debug_path + "chess_" + std::to_string(img_points.size()) +
                       ".jpg",
                   debug_image);
-      fprintf(stdout, "Pattern found and debug image writen!\n");
     }
     used_images.push_back(image.clone());
     img_points.push_back(corners);
